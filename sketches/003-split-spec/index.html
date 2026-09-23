@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Разворот мануала — вариант C</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --paper:#FCFCFA; --ink:#101112; --mute:#5C6266;
+  --blue:#1F4FD8; --line:#DDE1E4; --hair:#101112;
+}
+body{
+  font:400 17px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-weight:650;line-height:1.06;letter-spacing:-.025em}
+ul,ol{list-style:none;padding:0}a{color:inherit}
+.wrap{width:min(100% - 48px,1180px);margin-inline:auto}
+
+/* линейки, которые прочерчиваются при появлении */
+.bar{height:2px;background:var(--hair);transform:scaleX(0);transform-origin:left;
+  animation:draw .8s cubic-bezier(.2,.8,.25,1) forwards}
+@keyframes draw{to{transform:scaleX(1)}}
+.fade{opacity:0;transform:translateY(10px);animation:rise .55s cubic-bezier(.2,.8,.25,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}
+.d4{animation-delay:.32s}.d5{animation-delay:.4s}.d6{animation-delay:.48s}
+
+header{border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:20}
+.hd{display:flex;align-items:center;gap:26px;min-height:64px}
+.logo{font-size:17px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;margin-right:auto}
+.tick{width:18px;height:18px;border:2px solid var(--ink);border-radius:3px;position:relative;flex:0 0 auto}
+.tick::after{content:"";position:absolute;left:3px;top:5px;width:7px;height:4px;
+  border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(-45deg)}
+nav{display:flex;gap:24px}
+nav a{font-size:15px;color:var(--mute);text-decoration:none}
+nav a:hover{color:var(--ink)}
+.tel{font-size:16px;font-weight:600;text-decoration:none;letter-spacing:-.01em;white-space:nowrap;
+  border-bottom:2px solid var(--ink);padding-bottom:1px}
+.tel:hover{color:var(--blue);border-color:var(--blue)}
+
+/* ── герой: как разворот ── */
+.hero{padding:64px 0 0}
+.hgrid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:start}
+h1{font-size:clamp(36px,5vw,62px)}
+h1 .b{color:var(--blue)}
+.lead{margin-top:20px;font-size:19px;color:var(--mute);max-width:44ch;line-height:1.55}
+.acts{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:13px 23px;
+  font-size:16px;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap;
+  border:1.5px solid var(--hair);transition:transform .16s cubic-bezier(.2,.8,.25,1),background .16s,color .16s}
+.btn:hover{transform:translateY(-2px)}
+.btn--k{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn--k:hover{background:#173CB0}
+
+/* счётчик цен */
+table{width:100%;border-collapse:collapse;margin-top:22px;font-variant-numeric:tabular-nums}
+tr{border-top:1px solid var(--line)}
+tr:last-child{border-bottom:1px solid var(--line)}
+th,td{text-align:left;padding:11px 0}
+th{font-size:14px;font-weight:500;color:var(--mute)}
+td{font-size:17px;font-weight:650;text-align:right;letter-spacing:-.01em}
+tr.hi td{color:var(--blue)}
+.tcap{margin-top:9px;font-size:13px;color:var(--mute)}
+
+.note{border-left:2px solid var(--blue);padding:2px 0 2px 15px;margin-top:34px}
+.note b{display:block;font-size:15px;margin-bottom:3px}
+.note span{font-size:15px;color:var(--mute)}
+
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px;padding-top:20px}
+.facts div{border-top:1px solid var(--hair);padding-top:11px}
+.facts dt{font-size:13px;color:var(--mute)}
+.facts dd{font-size:25px;font-weight:650;letter-spacing:-.025em;margin-top:2px}
+
+/* живая мини-схема справа */
+.viz{border:1.5px solid var(--hair);background:#fff;padding:16px}
+.viz__hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding-bottom:11px;margin-bottom:13px;border-bottom:1px solid var(--line)}
+.viz__t{font-size:13px;color:var(--mute);letter-spacing:.02em}
+.viz__v{font-size:20px;font-weight:700;color:var(--blue);font-variant-numeric:tabular-nums}
+.line{stroke-dasharray:820;stroke-dashoffset:820;animation:draw2 1.8s cubic-bezier(.3,.75,.2,1) .6s forwards,flow 2.9s linear 2.4s infinite}
+@keyframes draw2{to{stroke-dashoffset:0}}
+@keyframes flow{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-14}}
+.blip{animation:blip 1.7s ease-in-out infinite}
+@keyframes blip{0%,100%{opacity:1}50%{opacity:.2}}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:7px 16px;margin-top:14px;font-size:13px;color:var(--mute)}
+.legend div{display:flex;align-items:center;gap:7px}
+.sw{width:15px;height:2.5px;flex:0 0 auto}
+
+section{padding:66px 0;border-top:1px solid var(--line)}
+h2{font-size:clamp(28px,3.6vw,42px);max-width:22ch}
+.slead{margin-top:11px;color:var(--mute);max-width:62ch}
+
+/* симптомы: строки с прогресс-индикацией слева */
+.sym{margin-top:28px}
+.sym li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:22px;align-items:start;
+  padding:19px 0;border-top:1px solid var(--line)}
+.sym li:last-child{border-bottom:1px solid var(--line)}
+.sym__q{font-size:19px;font-weight:600;letter-spacing:-.01em;line-height:1.3}
+.sym__d{margin-top:5px;font-size:16px;color:var(--mute);max-width:58ch}
+.sym__k{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--mute);white-space:nowrap;padding-top:5px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex:0 0 auto;
+  animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.45}}
+
+/* номенклатура */
+.spec{margin-top:26px}
+.spec li{display:grid;grid-template-columns:auto minmax(140px,230px) 1fr;align-items:center;gap:20px;
+  padding:17px 0;border-top:1px solid var(--line)}
+.spec li:last-child{border-bottom:1px solid var(--line)}
+.sico{width:32px;height:32px;color:var(--ink)}
+.sico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sname{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.ssub{font-size:16px;color:var(--mute)}
+
+.steps{margin-top:26px}
+.steps li{display:grid;grid-template-columns:40px 1fr;gap:19px;padding:20px 0;border-top:1px solid var(--line)}
+.steps li:last-child{border-bottom:1px solid var(--line)}
+.no{font-size:15px;font-weight:700;color:var(--blue);font-variant-numeric:tabular-nums;padding-top:2px}
+.steps h3{font-size:19px}
+.steps p{margin-top:5px;color:var(--mute);max-width:64ch;font-size:16px}
+
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:52px;margin-top:26px}
+.pcol h3{font-size:15px;color:var(--mute);font-weight:500;padding-bottom:10px;border-bottom:2px solid var(--hair)}
+.pcol--k h3{color:var(--blue)}
+.pcol li{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.pcol li span{font-size:16px;color:var(--mute)}
+.pcol li b{font-size:19px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.pcol--k li b{color:var(--blue)}
+.pfoot{margin-top:20px;font-size:15px;color:var(--mute)}
+
+.cta{border-top:2px solid var(--hair);padding:66px 0 26px;background:var(--paper)}
+.cgrid{display:grid;grid-template-columns:1.2fr auto;gap:52px;align-items:center}
+.ctitle{font-size:clamp(29px,3.8vw,46px);max-width:19ch}
+.clead{margin-top:15px;color:var(--mute);max-width:52ch}
+.cacts{display:flex;flex-direction:column;gap:11px;min-width:min(100%,300px)}
+.cfoot{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;font-size:14px;color:var(--mute)}
+footer{padding:0 0 26px;background:var(--paper)}
+.frow{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:14px;color:var(--mute)}
+
+@media(max-width:1000px){
+  .hgrid{grid-template-columns:1fr;gap:42px}
+  .pgrid,.cgrid{grid-template-columns:1fr}
+  .cacts{min-width:0}
+}
+@media(max-width:640px){
+  .hd{flex-wrap:wrap;row-gap:0}
+  .logo{font-size:15px}
+  nav{order:3;width:100%;min-width:0;gap:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+      border-top:1px solid var(--line);padding-top:9px;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav a{white-space:nowrap}
+  .tel{order:2;font-size:14px;padding-bottom:1px}
+  .facts{grid-template-columns:1fr;gap:11px}
+  .facts>div{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:9px}
+  .facts dd{margin-top:0}
+  .spec li{grid-template-columns:auto 1fr;row-gap:5px}
+  .ssub{grid-column:2}
+  .pgrid{grid-template-columns:1fr}
+  .sym li{grid-template-columns:1fr;gap:9px}
+  .sym__k{padding-top:0}
+  .cacts .btn{width:100%}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .bar{transform:none}.fade{opacity:1;transform:none}.line{stroke-dashoffset:0}.dot{transform:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <span class="logo"><span class="tick"></span>ИнструментБург</span>
+    <nav><a href="#sym">Симптомы</a><a href="#scope">Номенклатура</a><a href="#price">Прайс</a></nav>
+    <a class="tel" href="tel:+73432264443">+7 343 226-44-43</a>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <div class="hgrid">
+      <div>
+        <h1 class="fade d1">Ремонт источников<br>бесперебойного <span class="b">питания</span></h1>
+        <p class="lead fade d2">Диагностика и ремонт ИБП, UPS, инверторов и стабилизаторов. Меняем вышедший из строя узел, а не продаём новый блок целиком.</p>
+        <div class="acts fade d3">
+          <a class="btn btn--k" href="#cta">Прислать фото и узнать цену</a>
+          <a class="btn" href="tel:+73432264443">Позвонить в сервис</a>
+        </div>
+
+        <table class="fade d4">
+          <caption class="tcap">Прайс для физических лиц, класс «тяжёлый»</caption>
+          <tbody>
+            <tr><th scope="row">Диагностика</th><td>1 800 ₽</td></tr>
+            <tr><th scope="row">Ремонт простой</th><td>от 3 500 ₽</td></tr>
+            <tr class="hi"><th scope="row">Ремонт сложный</th><td>до 7 500 ₽</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note fade d5">
+          <b>Срок — до 10 дней</b>
+          <span>Гарантия: 90 дней на оригинальные запчасти, 30 — на аналоги.</span>
+        </div>
+      </div>
+
+      <div class="fade d2">
+        <div class="viz">
+          <div class="viz__hd"><span class="viz__t">Съём под нагрузкой</span><span class="viz__v">SAG −22 %</span></div>
+          <svg viewBox="0 0 400 220" style="display:block" fill="none" role="img" aria-label="График просадки напряжения под нагрузкой">
+            <defs>
+              <pattern id="vg" width="40" height="27.5" patternUnits="userSpaceOnUse">
+                <path d="M40 0H0v27.5" stroke="#E7EAEC" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="400" height="220" fill="#fff"/>
+            <rect width="400" height="220" fill="url(#vg)"/>
+            <path d="M0 138h400" stroke="#101112" stroke-width="1.3"/>
+            <path d="M0 55h400" stroke="#1F4FD8" stroke-width="1.2" stroke-dasharray="6 5" opacity=".65"/>
+            <path d="M0 157h48l12-5 14 5h52l16-7 19 7h40l18-9 22 9h42l14-6 18 6h51"
+                  stroke="#101112" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="line"/>
+            <circle cx="208" cy="146" r="4.4" fill="#1F4FD8" class="blip"/>
+            <path d="M208 146v-23" stroke="#1F4FD8" stroke-width="1.1"/>
+            <rect x="216" y="100" width="96" height="24" fill="#fff" stroke="#1F4FD8" stroke-width="1"/>
+            <text x="224" y="117" font-family="-apple-system,sans-serif" font-size="13" font-weight="600" fill="#1F4FD8">SAG 22%</text>
+            <text x="10" y="210" font-family="-apple-system,sans-serif" font-size="11" fill="#5C6266">НАГРУЗКА / РАЗРЯД</text>
+          </svg>
+          <div class="legend">
+            <div><span class="sw" style="background:#101112"></span>Линия нагрузки</div>
+            <div><span class="sw" style="background:#1F4FD8"></span>Порог просадки</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bar" style="margin-top:56px"></div>
+    <dl class="facts fade d6">
+      <div><dt>Диагностика</dt><dd>от 1 800 ₽</dd></div>
+      <div><dt>Срок ремонта</dt><dd>до 10 дней</dd></div>
+      <div><dt>Гарантия</dt><dd>до 90 дней</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="sym">
+  <div class="wrap">
+    <h2>С чем приходят</h2>
+    <p class="slead">Типовые признаки, по которым ИБП отправляют в ремонт.</p>
+    <ul class="sym">
+      <li>
+        <div><div class="sym__q">Пищит и не держит нагрузку</div><div class="sym__d">При переходе на батарею компьютер выключается или выбивает защиту.</div></div>
+        <div class="sym__k"><span class="dot"></span>инвертор</div>
+      </li>
+      <li>
+        <div><div class="sym__q">Батарея не заряжается</div><div class="sym__d">Время автономии не растёт месяцами, индикатор батареи не меняется.</div></div>
+        <div class="sym__k"><span class="dot"></span>цепь заряда</div>
+      </li>
+      <li>
+        <div><div class="sym__q">Не включается совсем</div><div class="sym__d">Ни индикации, ни признаков жизни — ищем причину по цепи питания.</div></div>
+        <div class="sym__k"><span class="dot"></span>предохранитель</div>
+      </li>
+      <li>
+        <div><div class="sym__q">Перегрев, запах гари</div><div class="sym__d">Горячие силовые элементы, вентилятор гонит горячий воздух без охлаждения.</div></div>
+        <div class="sym__k"><span class="dot"></span>силовая часть</div>
+      </li>
+      <li>
+        <div><div class="sym__q">Шумит вентилятор</div><div class="sym__d">Пластик шумит и трещит — износ подшипника, скоро выйдет из строя.</div></div>
+        <div class="sym__k"><span class="dot"></span>охлаждение</div>
+      </li>
+      <li>
+        <div><div class="sym__q">Нет напряжения на выходе</div><div class="sym__d">Розетки под напряжением, а техника не включается — ищем пробитый силовой ключ.</div></div>
+        <div class="sym__k"><span class="dot"></span>ключ</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="scope">
+  <div class="wrap">
+    <h2>Что ремонтируем</h2>
+    <p class="slead">От настольных до телеком- и серверных шкафов.</p>
+    <ul class="spec">
+      <li><span class="sico"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="12" rx="1.6"/><path d="M8 20h8M12 16v4M6.8 7.4h4.2M6.8 10.1h6.5M6.8 12.8h3"/></svg></span>
+        <span class="sname">Источники питания</span><span class="ssub">ИБП, UPS, инверторы, стабилизаторы, ИБПЛ</span></li>
+      <li><span class="sico"><svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="16" height="10" rx="1.8"/><path d="M20.5 10.5v3M10 9.3l-2.2 3.6h3.4L9 15.9"/></svg></span>
+        <span class="sname">Аккумуляторные батареи</span><span class="ssub">Замена комплектов, подбор по ёмкости и напряжению</span></li>
+      <li><span class="sico"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="1.4"/><path d="M7.5 7.5h4v3h-4zM14.5 7.5h2M14.5 10.5h2M8 14v2.5M11 13.5v3M14 14.5v2M17 13.5v3"/></svg></span>
+        <span class="sname">Силовые узлы</span><span class="ssub">Инверторы, ключи, предохранители, разъёмы</span></li>
+      <li><span class="sico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.1"/><path d="M12 9.9c0-2.6 1-4.6 2.7-4.6 1.4 0 2.4 1.3 2.2 3-.2 1.6-1.3 2.6-2.6 3.1M13.7 13.1c2.2 1.4 3.3 3 2.8 4.5-.4 1.3-1.9 1.8-3.4 1-1.4-.7-1.9-2.1-1.9-3.5M10.2 13.1c-2.3 1.3-4.2 1.9-5.4.5-1-1.2-.5-2.7 1-3.7 1.3-.9 2.8-.8 4.1-.3"/></svg></span>
+        <span class="sname">Охлаждение</span><span class="ssub">Вентиляторы, замена подшипников, чистка радиаторов</span></li>
+      <li><span class="sico"><svg viewBox="0 0 24 24"><rect x="4.5" y="3.5" width="15" height="17" rx="2"/><path d="M8 8.2h2.4M13.6 8.2H16M8 12h2.4M13.6 12H16M9.6 16.8h4.8"/></svg></span>
+        <span class="sname">Разъёмы и кабельная часть</span><span class="ssub">Разъёмы питания, входные и выходные кабели</span></li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Как идёт работа</h2>
+    <ol class="steps">
+      <li><span class="no">01</span><div><h3>Принимаем заявку</h3><p>Фото или модель и краткое описание. Задаём уточняющие вопросы, если нужно.</p></div></li>
+      <li><span class="no">02</span><div><h3>Диагностика</h3><p>Проверяем узлы под нагрузкой и на разряженной батарее. Называем цену и срок.</p></div></li>
+      <li><span class="no">03</span><div><h3>Ремонт</h3><p>Меняем неисправный узел, чистим контакты и радиаторы, обновляем смазку.</p></div></li>
+      <li><span class="no">04</span><div><h3>Проверка и выдача</h3><p>Гоняем под нагрузкой, отдаём с гарантией и письменным заключением по узлу.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section id="price">
+  <div class="wrap">
+    <h2>Цены на ремонт</h2>
+    <p class="slead">Класс «тяжёлый». Точную цену называем после диагностики.</p>
+    <div class="pgrid">
+      <div class="pcol"><h3>ФИЗИЧЕСКИМ ЛИЦАМ</h3><ul>
+        <li><span>Диагностика</span><b>1 800 ₽</b></li>
+        <li><span>Ремонт простой</span><b>от 3 500 ₽</b></li>
+        <li><span>Ремонт сложный</span><b>до 7 500 ₽</b></li>
+        <li><span>Замена батарей</span><b>по расчёту</b></li></ul></div>
+      <div class="pcol pcol--k"><h3>ЮРИДИЧЕСКИМ ЛИЦАМ</h3><ul>
+        <li><span>Диагностика</span><b>2 100 ₽</b></li>
+        <li><span>Ремонт простой</span><b>от 4 000 ₽</b></li>
+        <li><span>Ремонт сложный</span><b>до 8 500 ₽</b></li>
+        <li><span>Замена батарей</span><b>по расчёту</b></li></ul></div>
+    </div>
+    <p class="pfoot">Запчасти считаются отдельно. Диагностика входит в стоимость ремонта, если ремонт делается.</p>
+  </div>
+</section>
+
+<section class="cta" id="cta">
+  <div class="wrap">
+    <div class="cgrid">
+      <div><h2 class="ctitle">Пришлите фото — назовём цену</h2>
+        <p class="clead">Опишите, что происходит, и приложите фото или модель прибора. Ответим в WhatsApp в рабочее время.</p></div>
+      <div class="cacts">
+        <a class="btn btn--k" href="https://wa.me/73432264443?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%80%D0%B5%D0%BC%D0%BE%D0%BD%D1%82%20%D0%98%D0%91%D0%9F.%20%D0%9F%D1%80%D0%B8%D1%88%D0%BB%D1%8E%20%D1%84%D0%BE%D1%82%D0%BE%20%D0%B8%20%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BB%D0%B0%D0%BD%D0%B8%D0%B5.">Написать в WhatsApp</a>
+        <a class="btn" href="tel:+73432264443">+7 343 226-44-43</a>
+      </div>
+    </div>
+    <div class="cfoot"><span>ИнструментБург — сервисный центр, Екатеринбург</span><span>Ремонт ИБП — новое направление</span></div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap frow"><span>ИнструментБург, Екатеринбург</span><span>instrumentburg.ru</span></div></footer>
+</body>
+</html>

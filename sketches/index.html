@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Три варианта лендинга «Ремонт ИБП»</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:400 17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#FCFCFA;color:#101112;-webkit-font-smoothing:antialiased;padding:40px 24px 64px}
+.wrap{width:min(100%,1080px);margin-inline:auto}
+h1{font-size:clamp(28px,4vw,42px);font-weight:650;letter-spacing:-.025em;line-height:1.08}
+.lead{margin-top:12px;color:#5C6266;max-width:64ch}
+.cards{margin-top:38px;display:grid;gap:22px}
+.card{border:1.5px solid #101112;background:#fff;text-decoration:none;color:inherit;display:block;overflow:hidden;
+  transition:transform .18s cubic-bezier(.2,.8,.25,1)}
+.card:hover{transform:translateY(-3px)}
+.shot{width:100%;aspect-ratio:1280/820;object-fit:cover;object-position:top;border-bottom:1.5px solid #101112;background:#eee}
+.body{padding:20px 22px 24px}
+.tag{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#1F4FD8;font-weight:700}
+h2{font-size:23px;font-weight:650;letter-spacing:-.02em;margin-top:5px}
+p{margin-top:9px;color:#5C6266;font-size:16px}
+.meta{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;border:1px solid #DDE1E4;padding:3px 9px;color:#5C6266}
+.chip--b{background:#E2603F;border-color:#E2603F;color:#fff}
+.chip--a{background:#C8451F;border-color:#C8451F;color:#fff}
+.chip--c{background:#1F4FD8;border-color:#1F4FD8;color:#fff}
+.open{margin-top:15px;font-size:15px;font-weight:650}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid #DDE1E4;color:#5C6266;font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Три варианта лендинга «Ремонт ИБП»</h1>
+  <p class="lead">Разный характер, а не разный цвет. Во всех трёх есть анимация осциллографа, каскадное появление при загрузке и один сдержанный акцент. Выбери направление — доведу выбранный до продакшна.</p>
+
+  <div class="cards">
+    <a class="card" href="001-live-bench/">
+      <img class="shot" src="shots/variant-a.png" alt="Вариант A: живой стенд">
+      <div class="body">
+        <span class="tag">Вариант A · мой фаворит</span>
+        <h2>Живой стенд</h2>
+        <p>Светлая бумага, hairline-сетка. Главный элемент — большой осциллограф, где линия нагрузки едет слева направо, отметка просадки пульсирует, луч сканирует. Движение осмысленное: линия — это сигнал, который мы ловим.</p>
+        <div class="meta"><span class="chip chip--a">светлый</span><span class="chip">осциллограф</span><span class="chip">живая линия</span><span class="chip">сканирующий луч</span></div>
+        <div class="open">Открыть вариант A →</div>
+      </div>
+    </a>
+
+    <a class="card" href="002-dark-console/">
+      <img class="shot" src="shots/variant-b.png" alt="Вариант B: приборная стойка">
+      <div class="body">
+        <span class="tag">Вариант B</span>
+        <h2>Приборная стойка</h2>
+        <p>Не «чёрный фон с оранжевым», а реальная стойка: слоистые панели, вентиляционные щели, светящиеся индикаторы, моноширинные цифры и таблица замеров. Акцент — янтарный, как реальный индикатор на приборе.</p>
+        <div class="meta"><span class="chip chip--b">тёмный</span><span class="chip">моноширинный</span><span class="chip">таблица замеров</span><span class="chip">светящиеся индикаторы</span></div>
+        <div class="open">Открыть вариант B →</div>
+      </div>
+    </a>
+
+    <a class="card" href="003-split-spec/">
+      <img class="shot" src="shots/variant-c.png" alt="Вариант C: разворот мануала">
+      <div class="body">
+        <span class="tag">Вариант C</span>
+        <h2>Разворот мануала</h2>
+        <p>Белый пол, крупная типографика, линейки, которые прочерчиваются при появлении. Цены сразу в первом экране таблицей. Симптомы — строки с подписью вероятного виновника. Самый быстрый и дешёвый по весу.</p>
+        <div class="meta"><span class="chip chip--c">белый</span><span class="chip">синий акцент</span><span class="chip">таблица цен</span><span class="chip">анимированные линейки</span></div>
+        <div class="open">Открыть вариант C →</div>
+      </div>
+    </a>
+  </div>
+
+  <footer>Все три варианта: 5 секций, 6 типовых симптомов, прайс из калькулятора, WhatsApp и телефон. Без выдуманных цифр и без обещаний «сотни ремонтов» — в LiveSklad за 1000 заказов ноль ремонтов ИБП.</footer>
+</div>
+</body>
+</html>
