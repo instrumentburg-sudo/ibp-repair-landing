@@ -61,9 +61,23 @@ svg { display: block; }
 }
 .skip:focus { left: 1rem; top: 1rem; }
 
-/* ─── появление при загрузке: одна каскадная волна ─── */
-.rise { opacity: 0; transform: translateY(12px); animation: rise .55s var(--ease) forwards; }
-@keyframes rise { to { opacity: 1; transform: none; } }
+/* Кеш GitHub Pages агрессивный: старый styles.css может прийти уже после отрисовки.
+   Поэтому стартовое состояние reveal задаём инлайном в HTML — контент виден сразу.
+   Стили лишь снимают инлайн после применения, поэтому эффект не теряется.
+   ВАЖНО: стартовое opacity ставим только если поддерживается анимация;
+   иначе (старый CSS/кеш) текст остаётся видимым. */
+.noanim .rise,
+.noanim .d1, .noanim .d2, .noanim .d3,
+.noanim .d4, .noanim .d5, .noanim .d6 { animation: none; opacity: 1; transform: none; }
+.noanim .trace { animation: shift 3.1s linear infinite; stroke-dashoffset: 0; }
+/* Появление при загрузке. Важно: стартовое состояние НЕ opacity:0 в CSS.
+   Если CSS не догрузился или кеш отдал старую версию, контент обязан быть виден.
+   Анимация только добавляет эффект, но не прячет текст. */
+.rise { animation: rise .55s var(--ease) both; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
 .d1 { animation-delay: .05s } .d2 { animation-delay: .13s } .d3 { animation-delay: .21s }
 .d4 { animation-delay: .29s } .d5 { animation-delay: .37s } .d6 { animation-delay: .45s }
 
@@ -140,9 +154,18 @@ svg { display: block; }
 
 .crt { padding: 1rem; background: #0d1012; }
 .crt svg { width: 100%; height: auto; }
-.trace { stroke-dasharray: 900; stroke-dashoffset: 900; animation: draw 1.9s cubic-bezier(.3, .7, .2, 1) .55s forwards, shift 3.1s linear 2.45s infinite; }
-@keyframes draw { to { stroke-dashoffset: 0 } }
-@keyframes shift { 0%, 100% { stroke-dashoffset: 0 } 50% { stroke-dashoffset: -15 } }
+/* Прочерчивание линии. Длина пути около 351px в viewBox 380.
+   dasharray обязан совпадать с геометрией, иначе линия мигает рывками
+   вместо плавного рисования. Значение 380 с запасом на обе стороны. */
+.trace {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation:
+    draw 1.4s cubic-bezier(.3, .7, .2, 1) .45s forwards,
+    shift 3.1s linear 1.85s infinite;
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes shift { 0%, 100% { stroke-dashoffset: 0; } 50% { stroke-dashoffset: -18; } }
 .beam { animation: scan 3.1s linear infinite; }
 @keyframes scan { from { transform: translateX(-40px) } to { transform: translateX(400px) } }
 .blip { animation: blip 1.8s ease-in-out infinite; }
