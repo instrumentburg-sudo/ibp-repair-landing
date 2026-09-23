@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://instrumentburg-icp.vercel.app/sitemap.xml
